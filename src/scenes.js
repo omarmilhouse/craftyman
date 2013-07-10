@@ -19,12 +19,12 @@ Crafty.scene('Loading', function(){
       
         // Inizializzazione sprite
         
-        Crafty.sprite(1, 'assets/Ken.png', {
-          ken_punch:  [0, 1, 90, 120]
+        Crafty.sprite(90, 120, 'assets/Ken.png', {
+          ken_punch:  [0, 0]
         });
         
-        Crafty.sprite(1, 'assets/Ryu.png', {
-          ryu_punch:  [0, 1, 80, 100]
+        Crafty.sprite(100, 100, 'assets/Ryu_x3.png', {
+          ryu_punch:  [0, 0]
         }); 
         
         Crafty.scene('Game');
@@ -36,7 +36,12 @@ Crafty.scene('Game', function(){
     Crafty.background('url(assets/bg.gif)');
     //Crafty.viewport.scroll('_x', 500);
     
-    //var ken = Crafty.e('KenCharacter').at(5, 5);
+//    var platform = Crafty.e('BasePlatform').attr({
+//        x: 0,
+//        y: 150,
+//        w: 300,
+//        h: 10
+//    });
     var ryu = Crafty.e('RyuCharacter').attr({
         x: 250,
         y: 110
@@ -45,4 +50,5 @@ Crafty.scene('Game', function(){
         x: 50,
         y: 110
     });
+    
 });
