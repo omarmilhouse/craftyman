@@ -36,12 +36,10 @@ Crafty.scene('Game', function(){
     Crafty.background('url(assets/bg.gif)');
     //Crafty.viewport.scroll('_x', 500);
     
-//    var platform = Crafty.e('BasePlatform').attr({
-//        x: 0,
-//        y: 150,
-//        w: 300,
-//        h: 10
-//    });
+    Crafty.e("Platform, 2D, DOM")
+            .attr({ x: 0, y: 220, w: 400, h: 10 });
+    
+
     var ryu = Crafty.e('RyuCharacter').attr({
         x: 250,
         y: 110
