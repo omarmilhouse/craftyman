@@ -15,21 +15,24 @@ Crafty.scene('Loading', function() {
 	});
 
 	// Load our sprite map image
-	Crafty.load(['assets/ken_sprite.gif', 'assets/ryu_sprite.gif', 'assets/bg.gif'], function() {
+	Crafty.load(['assets/ken_sprite.gif', 'assets/Ryu/ryu_idle.png', 'assets/Ryu/ryu_walking.png', 'assets/Ryu/ryu_jump.png', 'assets/bg.gif'], function() {
 
 		// Inizializzazione sprite
 
 		Crafty.sprite(50, 105, 'assets/ken_sprite.gif', {
-			ken_punch : [0, 0]
+			ken_idle : [0, 0]
 		});
 
-		Crafty.sprite(50, 105, 'assets/ryu_sprite.gif', {
-			ryu_idle : [0, 0],
-			ryu_jump : [9, 0]
+		Crafty.sprite(50, 105, 'assets/Ryu/ryu_idle.png', {
+			ryu_idle : [0, 0]
 		});
-		
-		Crafty.sprite(49, 105, 'assets/ryu_sprite.gif', {
-			ryu_walking : [4, 0]
+
+		Crafty.sprite(49, 105, 'assets/Ryu/ryu_walking.png', {
+			ryu_walking : [0, 0]
+		});
+
+		Crafty.sprite(49, 105, 'assets/Ryu/ryu_jump.png', {
+			ryu_jump : [0, 0]
 		});
 
 		Crafty.scene('Game');
@@ -51,6 +54,8 @@ Crafty.scene('Game', function() {
 		x : 250,
 		y : 110
 	});
+	ryu.flip('X');
+	
 	var ken = Crafty.e('KenCharacter').attr({
 		x : 50,
 		y : 110
