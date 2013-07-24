@@ -31,9 +31,13 @@ Crafty.scene('Loading', function() {
 			ryu_walking : [0, 0]
 		});
 
-		Crafty.sprite(49, 105, 'assets/Ryu/ryu_jump.png', {
-			ryu_jump : [0, 0]
+		Crafty.sprite(43, 105, 'assets/Ryu/ryu_jump.png', {
+			//ryu_jump : [[0, 105], [43, 105], [52, 105], [80, 105], [38, 105], [80, 105],[43, 105]]
+			ryu_jump : [0,0]
 		});
+//		Crafty.sprite(49, 105, 'assets/Ryu/ryu_jump.png', {
+//			ryu_jump : [0, 0]
+//		});
 
 		Crafty.scene('Game');
 	});
