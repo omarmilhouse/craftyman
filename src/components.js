@@ -172,7 +172,7 @@ Crafty.c('PlayerCharacter', {
             
             this._currentSprite = this._sprites.jump;
             this.addComponent(this._currentSprite);
-            this.animate(this._currentSprite, 0, 0, 7);
+            this.animate(this._currentSprite, 0, 0, 5);
             this.animate(this._currentSprite, 40, 0);            
         }
         
@@ -181,7 +181,7 @@ Crafty.c('PlayerCharacter', {
 Crafty.c('RyuCharacter', {
 	init : function() {
 		this.requires('PlayerCharacter, MultiwayArrows');
-                this.multiwayarrows(6);
+                this.multiwayarrows(5);
                 this._name = 'Ryu';
                 
                 this.setSprites({
@@ -195,7 +195,7 @@ Crafty.c('RyuCharacter', {
 Crafty.c('KenCharacter', {
 	init : function() {
 		this.requires('PlayerCharacter, MultiwayWASD')
-                    .multiwaywasd(6);
+                    .multiwaywasd(5);
                     
                 this._name = 'Ken';
                 this.setSprites({
