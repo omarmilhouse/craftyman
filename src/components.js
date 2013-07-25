@@ -41,6 +41,17 @@ Crafty.c('MultiwayWASD', {
         var keys = {W: -90, D: 0, A: 180};
         this.multiwayadv(speed, keys);
         
+        this.bind('KeyDown', function(key) {
+            if(key.key == Crafty.keys['T']) {
+                this.trigger('onPunch');
+            }
+        })
+        this.bind('KeyUp', function(key) {
+            if(key.key == Crafty.keys['T']) {
+                this.trigger('afterPunch');
+            }
+        })
+        
         return this;
     }
     
@@ -54,6 +65,17 @@ Crafty.c('MultiwayArrows', {
         //this.multiway(speed, {UP_ARROW: -90, DOWN_ARROW: 90, RIGHT_ARROW: 0, LEFT_ARROW: 180});
         var keys = {UP_ARROW: -90, RIGHT_ARROW: 0, LEFT_ARROW: 180};
         this.multiwayadv(speed, keys);
+        
+        this.bind('KeyDown', function(key) {
+            if(key.key == Crafty.keys['M']) {
+                this.trigger('onPunch');
+            }
+        })
+        this.bind('KeyUp', function(key) {
+            if(key.key == Crafty.keys['M']) {
+                this.trigger('afterPunch');
+            }
+        })        
             
         return this;
     }
@@ -64,16 +86,18 @@ Crafty.c('PlayerCharacter', {
         _sprites : {},
         _name : 'Player',
         _currentSprite : '',
+        _spriteSingleFile: false,
+        _opponent: false,
+        _side: '',
+        _spriteRow: '0',
         
 	init : function() {
 		this.requires('2D, Canvas, Collision, Gravity, SpriteAnimation');
 		this.gravity("Platform");
 		this.onHit('Solid', this.stopMovement);
-		//this.twoway(4, 6)
-		this.CurrentAnimationSprite = '';
 
                 this.bind('NewDirection', function(data) {
-                    console.log(data);
+                    //console.log(data);
                     if(data.x == 0 && data.y == 0) {
                         this.idle();
                     } 
@@ -82,6 +106,24 @@ Crafty.c('PlayerCharacter', {
                         this.jump();
                     } else if(data.x > 0 || data.x < 0) {
                         this.walk();
+                    }
+                    
+                    if(this._side == 'l') {
+                        if(this.x > this._opponent.x) {
+                            this.flip('X');
+                            this._opponent.unflip('X');
+                        } else {
+                            this.unflip('X');
+                            this._opponent.flip('X');
+                        }
+                    } else if(this._side == 'r') {
+                        if(this.x < this._opponent.x) {
+                            this.unflip('X');
+                            this._opponent.flip('X');
+                        } else {
+                            this.flip('X');
+                            this._opponent.unflip('X');
+                        }
                     }
                     
                 });              
@@ -93,44 +135,14 @@ Crafty.c('PlayerCharacter', {
                     if(this.x >= 350) {
                         this.x = 350;
                     }
-                    
-                    //this.removeComponent(this.CurrentAnimationSprite);
                 });
-                /*
-		this.bind('KeyDown', function(key) {
-
-			this.reset();
-
-			console.log(key.keyCode);
-
-			if (key.keyCode == 38) {
-				this.removeComponent(this.CurrentAnimationSprite);
-				this.addComponent(this.JumpSprite);
-				this.animate(this.JumpSprite, 0, 0, 7);
-				this.animate(this.JumpSprite, 40, 0);
-				this.CurrentAnimationSprite = this.JumpSprite;
-			} else if (key.keyCode == 37 || key.keyCode == 39) {
-				this.removeComponent(this.CurrentAnimationSprite);
-				this.addComponent(this.WalkingSprite);
-				this.animate(this.WalkingSprite, 0, 0, 4);
-				this.animate(this.WalkingSprite, 40, -1);
-				this.CurrentAnimationSprite = this.WalkingSprite
-			}
+                
+		this.bind('onPunch', function() {
+                    this.punch();
 		});
-
-		this.bind('KeyUp', function(key) {
-			//Torna all'animazione idle solo se non c'è un'animazione di jump in corso
-			if (!this.isPlaying(this.JumpSprite)) {
-				this.removeComponent(this.CurrentAnimationSprite);
-				this.addComponent(this.IdleSprite);
-				this.animate(this.IdleSprite, 0, 0, 3);
-				this.animate(this.IdleSprite, 40, -1);
-				this.CurrentAnimationSprite = this.IdleSprite;
-			}
-		});
-                */
-		this.bind('AnimationEnd', function(e) {
-
+                
+		this.bind('afterPunch', function() {
+                    this.idle();
 		});
 	},
         setSprites: function(sprites) {
@@ -141,29 +153,39 @@ Crafty.c('PlayerCharacter', {
         idle: function() {
             if(this.isPlaying(this._sprites.idle)) return;
             this.stop();
-            
+
             if(this._currentSprite) {
                 this.removeComponent(this._currentSprite);
             }
-            
+
             this._currentSprite = this._sprites.idle;
+
             this.addComponent(this._currentSprite);
             this.animate(this._currentSprite, 0, 0, 3);
             this.animate(this._currentSprite, 40, -1);            
         },
         walk: function() {
-            if(this.isPlaying(this._sprites.walk)) return;
+            if(!(this._sprites.walk)) return;
+            var sprite = this._sprites.walk;
+            if(this.isPlaying(sprite)) return;
+            
+            if(this._spriteSingleFile) {
+                this.animate(sprite, 0, 1, 4);
+            } else {
+                this.animate(sprite, 0, 0, 4);
+            }
             
             if(this._currentSprite) {
                 this.removeComponent(this._currentSprite);
             }
             
-            this._currentSprite = this._sprites.walk;
+            this._currentSprite = sprite;
             this.addComponent(this._currentSprite);
-            this.animate(this._currentSprite, 0, 0, 4);
+            
             this.animate(this._currentSprite, 40, -1);            
         },
         jump: function() {
+            if(!(this._sprites.jump)) return;
             if(this.isPlaying(this._sprites.jump)) return;
             
             if(this._currentSprite) {
@@ -174,6 +196,20 @@ Crafty.c('PlayerCharacter', {
             this.addComponent(this._currentSprite);
             this.animate(this._currentSprite, 0, 0, 5);
             this.animate(this._currentSprite, 40, 0);            
+        },
+        punch: function() {
+            if(!(this._sprites.punch)) return;
+            var sprite = this._sprites.punch;
+            if(this.isPlaying(sprite)) return;
+            
+            if(this._currentSprite) {
+                this.removeComponent(this._currentSprite);
+            }
+            
+            this._currentSprite = sprite;
+            this.addComponent(this._currentSprite);
+            this.animate(this._currentSprite, 0, this._spriteRow, 2);
+            this.animate(this._currentSprite, 10, 0);            
         }
         
 });
@@ -183,11 +219,13 @@ Crafty.c('RyuCharacter', {
 		this.requires('PlayerCharacter, MultiwayArrows');
                 this.multiwayarrows(5);
                 this._name = 'Ryu';
+                this._spriteRow = 1;
                 
                 this.setSprites({
                     idle : 'ryu_idle',
-                    walk : 'ryu_walking',
-                    jump : 'ryu_jump'
+                    walk : 'ryu_walk',
+                    jump : 'ryu_jump',
+                    punch : 'ryu_punch'
                 });
 	}
 });
@@ -200,8 +238,10 @@ Crafty.c('KenCharacter', {
                 this._name = 'Ken';
                 this.setSprites({
                     idle : 'ken_idle',
-                    walk : 'ken_walking',
-                    jump : 'ken_jump'
-                });                    
+                    walk : 'ken_walk',
+                    punch : 'ken_punch'
+                });    
+
+                this._spriteSingleFile = true;
 	}
 });

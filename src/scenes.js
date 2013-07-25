@@ -15,32 +15,43 @@ Crafty.scene('Loading', function() {
 	});
 
 	// Load our sprite map image
-	Crafty.load(['assets/ken_sprite.gif', 'assets/Ryu/ryu_idle.png', 'assets/Ryu/ryu_walking.png', 'assets/Ryu/ryu_jump.png', 'assets/bg.gif'], function() {
+	Crafty.load(['assets/Ken/ken.png', 
+            'assets/Punch.png',
+            'assets/Ryu/ryu_idle.png', 
+            'assets/Ryu/ryu_walking.png', 
+            'assets/Ryu/ryu_jump.png', 
+            'assets/bg.gif'], function() {
 
 		// Inizializzazione sprite
 
-		Crafty.sprite(50, 105, 'assets/ken_sprite.gif', {
-			ken_idle : [0, 0]
+		Crafty.sprite(50, 100, 'assets/Ken/ken.png', {
+                    ken_idle : [0, 0],
+                    ken_walk : [0, 1]
 		});
-
+                
+		Crafty.sprite(60, 100, 'assets/Punch.png', {
+                    ken_punch : [0, 0],
+                    ryu_punch : [0, 1]
+		});
+                
+                /*
+		Crafty.sprite(50, 105, 'assets/ken_sprite.gif', {
+			ken_idle : [0, 0],
+		});
+                */
+               
 		Crafty.sprite(50, 105, 'assets/Ryu/ryu_idle.png', {
 			ryu_idle : [0, 0]
 		});
 
 		Crafty.sprite(49, 105, 'assets/Ryu/ryu_walking.png', {
-			ryu_walking : [0, 0]
+			ryu_walk : [0, 0]
 		});
 
-//		Crafty.sprite(43, 105, 'assets/Ryu/ryu_jump.png', {
-//			ryu_jump : [0,0]
-//		});
 		Crafty.sprite(80, 105, 'assets/Ryu/ryu_jump_80.png', {
 			//ryu_jump : [[0, 105], [43, 105], [52, 105], [80, 105], [38, 105], [80, 105],[43, 105]]
 			ryu_jump : [0,0]
 		});
-//		Crafty.sprite(49, 105, 'assets/Ryu/ryu_jump.png', {
-//			ryu_jump : [0, 0]
-//		});
 
 		Crafty.scene('Game');
 	});
@@ -64,8 +75,12 @@ Crafty.scene('Game', function() {
 	ryu.flip('X');
 	
 	var ken = Crafty.e('KenCharacter').attr({
-		x : 50,
-		y : 110
+		x : 100,
+		y : 112
 	});
 
+        ken._opponent = ryu;
+        ken._side = 'l';
+        ryu._opponent = ken;
+        ryu._side = 'r';
 });
