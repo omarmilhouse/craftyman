@@ -194,7 +194,7 @@ Crafty.c('PlayerCharacter', {
             
             this._currentSprite = this._sprites.jump;
             this.addComponent(this._currentSprite);
-            this.animate(this._currentSprite, 0, 0, 5);
+            this.animate(this._currentSprite, 0, this._spriteRow, 5);
             this.animate(this._currentSprite, 40, 0);            
         },
         punch: function() {
@@ -209,7 +209,7 @@ Crafty.c('PlayerCharacter', {
             this._currentSprite = sprite;
             this.addComponent(this._currentSprite);
             this.animate(this._currentSprite, 0, this._spriteRow, 2);
-            this.animate(this._currentSprite, 10, 0);            
+            this.animate(this._currentSprite, 15, 0);            
         }
         
 });
@@ -227,6 +227,8 @@ Crafty.c('RyuCharacter', {
                     jump : 'ryu_jump',
                     punch : 'ryu_punch'
                 });
+                
+                this._spriteSingleFile = true;
 	}
 });
 
@@ -239,6 +241,7 @@ Crafty.c('KenCharacter', {
                 this.setSprites({
                     idle : 'ken_idle',
                     walk : 'ken_walk',
+                    jump : 'ken_jump',
                     punch : 'ken_punch'
                 });    
 
