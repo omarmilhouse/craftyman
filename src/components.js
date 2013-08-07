@@ -84,6 +84,8 @@ Crafty.c('MultiwayArrows', {
 
 Crafty.c('PlayerCharacter', {
         _sprites : {},
+        _status : 'idle',
+        _collision: false,
         _name : 'Player',
         _currentSprite : '',
         _spriteSingleFile: false,
@@ -95,17 +97,38 @@ Crafty.c('PlayerCharacter', {
 		this.requires('2D, Canvas, Collision, Gravity, SpriteAnimation');
 		this.gravity("Platform");
 		this.onHit('Solid', this.stopMovement);
-
+                
                 this.bind('NewDirection', function(data) {
-                    //console.log(data);
                     if(data.x == 0 && data.y == 0) {
-                        this.idle();
+                        this.execute('idle');
                     } 
                     
                     if(data.y < 0) {
-                        this.jump();
+                        //this.jump();
+                        //this.execute('jump');
                     } else if(data.x > 0 || data.x < 0) {
-                        this.walk();
+                        //this.walk();
+                    }
+                    
+                    
+                });              
+                
+                this.bind('Moved', function(data) {
+                    if(this._status == 'punch') {
+                        this.x = data.x;
+                        this.y = data.y;
+                    } else {
+                        if(this.x != data.x)
+                            this.execute('walk');
+                        else if(this.y != data.y)
+                            this.execute('jump');
+                    }
+                    
+                    if(this.x <= 0) {
+                        this.x = 0;
+                    }
+                    if(this.x >= 350) {
+                        this.x = 350;
                     }
                     
                     if(this._side == 'l') {
@@ -116,6 +139,7 @@ Crafty.c('PlayerCharacter', {
                             this.unflip('X');
                             this._opponent.flip('X');
                         }
+                        
                     } else if(this._side == 'r') {
                         if(this.x < this._opponent.x) {
                             this.unflip('X');
@@ -125,33 +149,51 @@ Crafty.c('PlayerCharacter', {
                             this._opponent.unflip('X');
                         }
                     }
-                    
-                });              
-                
-                this.bind('Moved', function(data) {
-                    if(this.x <= 0) {
-                        this.x = 0;
-                    }
-                    if(this.x >= 350) {
-                        this.x = 350;
-                    }
                 });
                 
 		this.bind('onPunch', function() {
-                    this.punch();
+                    this.execute('punch');
 		});
                 
 		this.bind('afterPunch', function() {
-                    this.idle();
+                    //this.execute('idle');
 		});
+                
+                this.bind('EnterFrame', function(){
+                    
+                    this.updateAnimation();
+                });
+                
 	},
+        updateAnimation: function() {
+            if(this._status == 'idle') {
+                this.idle();
+            } else if(this._status == 'walk') {
+                this.walk();
+            } else if(this._status == 'jump') {
+                this.jump();
+            } else if(this._status == 'punch') {
+                this.punch();
+            }            
+        },
+        execute: function(status) {
+            if(status == 'punch') {
+                if(this._status == 'idle' || this._status == 'walk') 
+                    this._status = status;
+            } else if(status == 'walk') {
+                if(this._status != 'punch') 
+                    this._status = status;
+            } else
+                this._status = status;
+        },
         setSprites: function(sprites) {
             this._sprites = sprites;
-            this.idle();
+            this.execute('idle');
         },
         
         idle: function() {
             if(this.isPlaying(this._sprites.idle)) return;
+
             this.stop();
 
             if(this._currentSprite) {
@@ -162,12 +204,16 @@ Crafty.c('PlayerCharacter', {
 
             this.addComponent(this._currentSprite);
             this.animate(this._currentSprite, 0, 0, 3);
-            this.animate(this._currentSprite, 40, -1);            
+            this.animate(this._currentSprite, 40, -1);     
+            
+            //this._status = 'idle';
         },
         walk: function() {
             if(!(this._sprites.walk)) return;
             var sprite = this._sprites.walk;
             if(this.isPlaying(sprite)) return;
+            
+            this.stop();
             
             if(this._spriteSingleFile) {
                 this.animate(sprite, 0, 1, 4);
@@ -182,11 +228,15 @@ Crafty.c('PlayerCharacter', {
             this._currentSprite = sprite;
             this.addComponent(this._currentSprite);
             
-            this.animate(this._currentSprite, 40, -1);            
+            this.animate(this._currentSprite, 40, -1); 
+            
+            //this._status = 'walk';
         },
         jump: function() {
             if(!(this._sprites.jump)) return;
             if(this.isPlaying(this._sprites.jump)) return;
+            
+            this.stop();
             
             if(this._currentSprite) {
                 this.removeComponent(this._currentSprite);
@@ -196,11 +246,15 @@ Crafty.c('PlayerCharacter', {
             this.addComponent(this._currentSprite);
             this.animate(this._currentSprite, 0, this._spriteRow, 5);
             this.animate(this._currentSprite, 40, 0);            
+            
+            //this._status = 'jump';
         },
         punch: function() {
             if(!(this._sprites.punch)) return;
             var sprite = this._sprites.punch;
             if(this.isPlaying(sprite)) return;
+            
+            this.unbind('AnimationEnd');
             
             if(this._currentSprite) {
                 this.removeComponent(this._currentSprite);
@@ -209,7 +263,11 @@ Crafty.c('PlayerCharacter', {
             this._currentSprite = sprite;
             this.addComponent(this._currentSprite);
             this.animate(this._currentSprite, 0, this._spriteRow, 2);
-            this.animate(this._currentSprite, 15, 0);            
+            this.animate(this._currentSprite, 15, 0); 
+            
+            this.bind('AnimationEnd', function() {
+                this.execute('idle');
+            })
         }
         
 });
